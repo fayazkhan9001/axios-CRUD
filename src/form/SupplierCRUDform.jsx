@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { ImPencil2 } from "react-icons/im";
+import { BsTrash } from "react-icons/bs";
 
 function SupplierCRUDform() {
   const [alert, setAlert] = useState(false);
@@ -24,7 +26,8 @@ function SupplierCRUDform() {
     }),
     onSubmit: async (values) => {
       await axios.post("http://localhost:5000/supplier/post", values);
-      setAlert(!alert);
+
+      fetchData();
     },
   });
 
@@ -37,6 +40,11 @@ function SupplierCRUDform() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleDelete = async (id) => {
+    await axios.delete(`http://localhost:5000/supplier/delete/${id}`);
+    fetchData();
+  };
 
   return (
     <div>
@@ -116,6 +124,7 @@ function SupplierCRUDform() {
                 <th>Commission</th>
                 <th>Email</th>
                 <th>Address</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -130,6 +139,17 @@ function SupplierCRUDform() {
                   <td className="pl-5">{item.commision}</td>
                   <td className="pl-5">{item.email}</td>
                   <td className="pl-5">{item.address}</td>
+                  <td className="flex items-center justify-between text-xl font-bold">
+                    <span className="text-indigo-500">
+                      <ImPencil2 />
+                    </span>
+                    <span
+                      onClick={() => handleDelete(item.id)}
+                      className="text-orange-500"
+                    >
+                      <BsTrash />
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
