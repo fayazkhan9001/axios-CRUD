@@ -84,7 +84,7 @@ const UserInputForm = () => {
   const fetchData = async () => {
     await axios
       .get("http://localhost:5000/supplier/get")
-      .then((res) => setData(res.data));
+      .then((res) => setData(res?.data));
   };
   useEffect(() => {
     fetchData();
@@ -93,7 +93,7 @@ const UserInputForm = () => {
   const handleDelete = async (id) => {
     await axios
       .delete(`http://localhost:5000/supplier/delete/${id}`)
-      .then((res) => setDeleteMsg(res.status));
+      .then((res) => setDeleteMsg(res?.status));
     fetchData();
   };
 

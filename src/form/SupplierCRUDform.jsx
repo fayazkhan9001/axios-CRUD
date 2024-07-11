@@ -8,17 +8,19 @@ import { BsTrash } from "react-icons/bs";
 function SupplierCRUDform() {
   const [alert, setAlert] = useState(false);
   const [getData, setGetData] = useState([]);
+  const [getSingleRecord, setGetSingleRecord] = useState({});
   const formik = useFormik({
     initialValues: {
-      supplier_Category: "",
-      supplier_Name: "",
-      contact_Number: "",
-      currency: "",
-      roe: "",
-      commision: "",
-      email: "",
-      address: "",
+      supplier_Category: getSingleRecord?.supplier_Category || "",
+      supplier_Name: getSingleRecord?.supplier_Name || "",
+      contact_Number: getSingleRecord?.contact_Number || "",
+      currency: getSingleRecord?.currency || "",
+      roe: getSingleRecord?.roe || "",
+      commision: getSingleRecord?.commision || "",
+      email: getSingleRecord?.email || "",
+      address: getSingleRecord?.address || "",
     },
+    enableReinitialize: true,
     validationSchema: Yup.object({
       supplier_Name: Yup.string().required(),
       contact_Number: Yup.number().required(),
@@ -31,9 +33,17 @@ function SupplierCRUDform() {
     },
   });
 
+  const handleUpdate = (id) => {
+    axios
+      .get(`http://localhost:5000/supplier/get/${id}`)
+      .then((res) => setGetSingleRecord(res?.data.data));
+  };
+
+  console.log(getSingleRecord);
+
   const fetchData = async () => {
     const resposne = await axios.get("http://localhost:5000/supplier/get");
-    const resData = resposne.data;
+    const resData = resposne?.data;
     setGetData(resData);
   };
 
@@ -43,6 +53,7 @@ function SupplierCRUDform() {
 
   const handleDelete = async (id) => {
     await axios.delete(`http://localhost:5000/supplier/delete/${id}`);
+    setAlert(true);
     fetchData();
   };
 
@@ -92,8 +103,11 @@ function SupplierCRUDform() {
             className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
             role="alert"
           >
-            <strong className="font-bold">Added!</strong>
-            <span className="block sm:inline">The record has been added.</span>
+            <strong className="font-bold">Deleted!</strong>
+            <span className="block sm:inline">
+              {" "}
+              The record has been deleted.
+            </span>
             <span
               onClick={() => setAlert(!alert)}
               className="absolute top-0 bottom-0 right-0 px-4 py-3"
@@ -140,12 +154,15 @@ function SupplierCRUDform() {
                   <td className="pl-5">{item.email}</td>
                   <td className="pl-5">{item.address}</td>
                   <td className="flex items-center justify-between text-xl font-bold">
-                    <span className="text-indigo-500">
+                    <span
+                      onClick={() => handleUpdate(item.id)}
+                      className="text-indigo-500 cursor-pointer"
+                    >
                       <ImPencil2 />
                     </span>
                     <span
                       onClick={() => handleDelete(item.id)}
-                      className="text-orange-500"
+                      className="text-orange-500 cursor-pointer"
                     >
                       <BsTrash />
                     </span>
