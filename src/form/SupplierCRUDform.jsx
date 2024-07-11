@@ -27,9 +27,16 @@ function SupplierCRUDform() {
       address: Yup.string().required(),
     }),
     onSubmit: async (values) => {
-      await axios.post("http://localhost:5000/supplier/post", values);
-
-      fetchData();
+      if (getSingleRecord) {
+        await axios.patch(
+          `http://localhost:5000/supplier/update/${getSingleRecord.id}`,
+          values
+        );
+        fetchData();
+      } else {
+        await axios.post("http://localhost:5000/supplier/post", values);
+        fetchData();
+      }
     },
   });
 
@@ -93,7 +100,7 @@ function SupplierCRUDform() {
               type="submit"
               className="border-2 px-6 py-1 bg-blue-500 text-white"
             >
-              save
+              {getSingleRecord ? "update" : " save"}
             </button>
           </form>
         </div>
