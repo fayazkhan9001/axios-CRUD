@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 
 function SupplierCRUDform() {
   const [alert, setAlert] = useState(false);
+  const [getData, setGetData] = useState([]);
   const formik = useFormik({
     initialValues: {
       supplier_Category: "",
@@ -26,6 +27,17 @@ function SupplierCRUDform() {
       setAlert(!alert);
     },
   });
+
+  const fetchData = async () => {
+    const resposne = await axios.get("http://localhost:5000/supplier/get");
+    const resData = resposne.data;
+    setGetData(resData);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <div>
       <div className="">
@@ -90,6 +102,39 @@ function SupplierCRUDform() {
             </span>
           </div>
         ) : null}
+
+        <div>
+          <table className="w-full">
+            <thead>
+              <tr>
+                <th>Id</th>
+                <th>Supplier Category</th>
+                <th>Supplier Name</th>
+                <th>Contact</th>
+                <th>Currency</th>
+                <th>ROE</th>
+                <th>Commission</th>
+                <th>Email</th>
+                <th>Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {getData.map((item, idx) => (
+                <tr key={idx}>
+                  <td className="pl-3">{item.id}</td>
+                  <td className="pl-5">{item.supplier_Category}</td>
+                  <td className="pl-5">{item.supplier_Name}</td>
+                  <td className="pl-5">{item.contact_Number}</td>
+                  <td className="pl-5">{item.currency}</td>
+                  <td className="pl-5">{item.roe}</td>
+                  <td className="pl-5">{item.commision}</td>
+                  <td className="pl-5">{item.email}</td>
+                  <td className="pl-5">{item.address}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
