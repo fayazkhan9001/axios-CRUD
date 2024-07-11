@@ -1,6 +1,7 @@
 import React from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import axios from "axios";
 function SupplierCRUDform() {
   const formik = useFormik({
     initialValues: {
@@ -18,8 +19,8 @@ function SupplierCRUDform() {
       contact_Number: Yup.number().required(),
       address: Yup.string().required(),
     }),
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async (values) => {
+      await axios.post("http://localhost:5000/supplier/post", values);
     },
   });
   return (
@@ -48,7 +49,7 @@ function SupplierCRUDform() {
                   className="w-full border-2"
                 />
                 {formik.touched[name] && formik.errors[name] ? (
-                  <label className="text-sm text-red">
+                  <label className="text-sm text-red-500">
                     {formik.errors[name]}
                   </label>
                 ) : null}
