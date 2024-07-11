@@ -8,7 +8,7 @@ import { BsTrash } from "react-icons/bs";
 function SupplierCRUDform() {
   const [alert, setAlert] = useState(false);
   const [getData, setGetData] = useState([]);
-  const [getSingleRecord, setGetSingleRecord] = useState({});
+  const [getSingleRecord, setGetSingleRecord] = useState();
   const formik = useFormik({
     initialValues: {
       supplier_Category: getSingleRecord?.supplier_Category || "",
@@ -26,16 +26,23 @@ function SupplierCRUDform() {
       contact_Number: Yup.number().required(),
       address: Yup.string().required(),
     }),
-    onSubmit: async (values) => {
-      if (getSingleRecord) {
-        await axios.patch(
-          `http://localhost:5000/supplier/update/${getSingleRecord.id}`,
-          values
-        );
-        fetchData();
-      } else {
-        await axios.post("http://localhost:5000/supplier/post", values);
-        fetchData();
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        if (getSingleRecord) {
+          await axios.patch(
+            `http://localhost:5000/supplier/update/${getSingleRecord.id}`,
+            values
+          );
+          fetchData();
+          resetForm();
+          setGetSingleRecord("");
+        } else {
+          await axios.post("http://localhost:5000/supplier/post", values);
+          fetchData();
+          resetForm();
+        }
+      } catch (error) {
+        console.log("Error submitting form", error);
       }
     },
   });
@@ -46,12 +53,9 @@ function SupplierCRUDform() {
       .then((res) => setGetSingleRecord(res?.data.data));
   };
 
-  console.log(getSingleRecord);
-
   const fetchData = async () => {
     const resposne = await axios.get("http://localhost:5000/supplier/get");
-    const resData = resposne?.data;
-    setGetData(resData);
+    setGetData(resposne?.data);
   };
 
   useEffect(() => {
@@ -63,6 +67,8 @@ function SupplierCRUDform() {
     setAlert(true);
     fetchData();
   };
+
+  console.log(getSingleRecord);
 
   return (
     <div>
@@ -100,7 +106,7 @@ function SupplierCRUDform() {
               type="submit"
               className="border-2 px-6 py-1 bg-blue-500 text-white"
             >
-              {getSingleRecord ? "update" : " save"}
+              {getSingleRecord ? "update" : "save"}
             </button>
           </form>
         </div>
